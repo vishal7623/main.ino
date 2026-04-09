@@ -2,6 +2,9 @@ name: Build ESP8266 BIN
 
 on: [push]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,14 +20,15 @@ jobs:
         arduino-cli core update-index
         arduino-cli core install esp8266:esp8266
 
-    - name: Install Libraries
+    - name: Install Required Libraries
       run: |
         arduino-cli lib install "UniversalTelegramBot"
         arduino-cli lib install "ArduinoJson"
+        arduino-cli lib install "ESP8266WiFi"
 
-    - name: Compile
+    - name: Compile Code
       run: |
-        arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 . --output-dir build
+        arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 . --output-dir build --verbose
 
     - name: Upload BIN
       uses: actions/upload-artifact@v4
