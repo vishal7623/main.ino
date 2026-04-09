@@ -1,0 +1,33 @@
+name: Build ESP8266 BIN
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Arduino CLI
+      uses: arduino/setup-arduino-cli@v1
+
+    - name: Install ESP8266 core
+      run: |
+        arduino-cli core update-index
+        arduino-cli core install esp8266:esp8266
+
+    - name: Install Libraries
+      run: |
+        arduino-cli lib install "UniversalTelegramBot"
+        arduino-cli lib install "ArduinoJson"
+
+    - name: Compile
+      run: |
+        arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 . --output-dir build
+
+    - name: Upload BIN
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: build/*.bin
